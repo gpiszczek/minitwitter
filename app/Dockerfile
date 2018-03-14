@@ -15,5 +15,8 @@ RUN npm install && npm cache clean --force
 # copy source code
 COPY . ./
 
+# run as non-priviledged user
+USER node:node
+
 # run command
 CMD [ "node", "index.js" ]
