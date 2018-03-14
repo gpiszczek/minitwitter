@@ -2,23 +2,40 @@ version: '3'
 
 services:
   web:
+    image: gpiszczek/minitwitter_web
     build:
       context: web
+    deploy:
+      replicas: 1
+    networks:
+      - frontend
     ports:
       - '80:80'
     depends_on:
       - app
   app:
+    image: gpiszczek/minitwitter_app
     build:
       context: app
+    deploy:
+      replicas: 1
+    networks:
+      - frontend
+      - backend
     depends_on:
       - mongo
   mongo:
     image: mongo:3.6
     command: ["mongod", "--smallfiles"]
+    networks:
+      - backend
     volumes:
       - mongo-configdb:/data/configdb
       - mongo-db:/data/db
+
+networks:
+  frontend:
+  backend:
 
 volumes:
   mongo-configdb:
