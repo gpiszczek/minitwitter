@@ -18,6 +18,14 @@ passport.deserializeUser(User.deserializeUser());
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://mongo/minitwitter', {
   useMongoClient: true,
+}).on('error', function (err) {
+  console.log(String(err));
+  setTimeout(function () {
+    console.log("Retrying first connect to mongodb...");
+    mongoose.connect('mongodb://mongo/minitwitter', {
+      useMongoClient: true,
+    })
+  }, 5 * 1000)
 });
 
 // create new express application
