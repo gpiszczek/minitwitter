@@ -3,6 +3,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var RedisStore = require('connect-redis')(session);
 var passport = require('passport');
 var Strategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
@@ -34,7 +35,14 @@ app.use(logger('combined'));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session({ secret: 'alamakota', resave: false, saveUninitialized: false }));
+app.use(session({
+  store: new RedisStore({ host: 'redis', port: 6379 }),
+  secret: '9eL;{22FK>NQnd',
+  resave: false,
+  saveUninitialized: false
+}));
+
+//store: new redisStore({ host: 'localhost', port: 6379, client: client,ttl :  260}),
 
 // initialize passport
 app.use(passport.initialize());

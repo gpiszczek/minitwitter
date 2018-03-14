@@ -24,6 +24,13 @@ services:
       - backend
     depends_on:
       - mongo
+      - redis
+  redis:
+    image: redis:4.0
+    deploy:
+      replicas: 1
+    networks:
+      - backend
   mongo:
     image: mongo:3.6
     command: ["mongod", "--smallfiles"]
