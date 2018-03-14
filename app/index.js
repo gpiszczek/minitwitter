@@ -15,16 +15,14 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 // mongoose config
+var mongoUri = 'mongodb://mongo/minitwitter';
+var mongoOpts = { useMongoClient: true };
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://mongo/minitwitter', {
-  useMongoClient: true,
-}).on('error', function (err) {
+mongoose.connect(mongoUri, mongoOpts, function (err) {
   console.log(String(err));
   setTimeout(function () {
     console.log("Retrying first connect to mongodb...");
-    mongoose.connect('mongodb://mongo/minitwitter', {
-      useMongoClient: true,
-    })
+    mongoose.connect(mongoUri, mongoOpts)
   }, 5 * 1000)
 });
 
