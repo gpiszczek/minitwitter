@@ -1,0 +1,18 @@
+<form class="form form-inline" ng-submit="login()">
+  <div ng-show="error" class="alert alert-danger">{{errorMessage}}</div>
+  <div class="form-group">
+    <h4>Logowanie</h4>
+  </div>
+  <div class="form-group">
+    <input type="text" class="form-control" name="username" placeholder="Użytkownik" ng-model="loginForm.username" required>
+  </div>
+  <div class="form-group">
+    <input type="password" class="form-control" name="password" placeholder="Hasło" ng-model="loginForm.password" required>
+  </div>
+  <div class="form-group">
+    <button type="submit" class="btn btn-default" ng-disabled="disabled">Zaloguj</button>
+  </div>
+  <div class="form-group">
+    <a href="/#/register" class="btn btn-default" >Rejestracja</a>
+  </div>
+</form>

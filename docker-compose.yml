@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  proxy:
+    build:
+      context: proxy
+    ports:
+      - '80:80'
+    depends_on:
+      - app
+  app:
+    build:
+      context: app
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo:3.6
+    command: ["mongod", "--smallfiles"]
+    volumes:
+      - mongo-configdb:/data/configdb
+      - mongo-db:/data/db
+
+volumes:
+  mongo-configdb:
+  mongo-db:

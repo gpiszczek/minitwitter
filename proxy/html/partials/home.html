@@ -1,0 +1,13 @@
+<form role="form" class="form" ng-submit="addPost()">
+  <div class="form-group">
+    <div class="input-group">
+      <input type="text" class="form-control" name="postbody" placeholder="Treść" ng-model="postForm.body" required>
+      <span class="input-group-btn">
+        <button type="submit" class="btn btn-default" ng-disabled="disabled">Dodaj wpis</button>
+      </span>
+      <span class="input-group-btn" ng-controller="logoutController">
+        <a ng-click="logout()" class="btn btn-default">Wyloguj</a>
+      </span>
+    </div>
+  </div>
+</form>
