@@ -19,9 +19,9 @@ var mongoUri = 'mongodb://mongo/minitwitter';
 var mongoOpts = { useMongoClient: true };
 mongoose.Promise = global.Promise;
 mongoose.connect(mongoUri, mongoOpts, function (err) {
-  console.log(String(err));
+  console.log("First connect to mongodb failed");
   setTimeout(function () {
-    console.log("Retrying first connect to mongodb...");
+    console.log("Retrying connect to mongodb...");
     mongoose.connect(mongoUri, mongoOpts)
   }, 5 * 1000)
 });
