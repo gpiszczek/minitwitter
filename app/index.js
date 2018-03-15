@@ -20,11 +20,15 @@ var mongoUri = 'mongodb://mongo/minitwitter';
 var mongoOpts = { useMongoClient: true };
 mongoose.Promise = global.Promise;
 mongoose.connect(mongoUri, mongoOpts, function (err) {
-  console.log('First connect to mongodb failed');
-  setTimeout(function () {
-    console.log('Retrying connect to mongodb...');
-    mongoose.connect(mongoUri, mongoOpts)
-  }, 5 * 1000)
+  if (err) {
+    console.log('First connect to mongodb failed');
+    setTimeout(function () {
+      console.log('Retrying to connect to mongodb...');
+      mongoose.connect(mongoUri, mongoOpts)
+    }, 5 * 1000)
+  } else {
+    console.log('Connection to mongodb established')
+  }
 });
 
 // create new express application
