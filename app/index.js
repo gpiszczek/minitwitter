@@ -9,27 +9,33 @@ var Strategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
 var routes = require('./routes/index');
 
-// passport config
+// configure passport
 var User = require('./models/user');
 passport.use(new Strategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// mongoose config
+// connect to mongodb
 var mongoUri = 'mongodb://mongo/minitwitter';
 var mongoOpts = { useMongoClient: true };
 mongoose.Promise = global.Promise;
 mongoose.connect(mongoUri, mongoOpts, function (err) {
   if (err) {
-    console.log('First connect to mongodb failed');
+    console.log(new Date().toISOString(), 'Connection to mongodb failed, retrying...');
     setTimeout(function () {
-      console.log('Retrying to connect to mongodb...');
-      mongoose.connect(mongoUri, mongoOpts)
-    }, 5 * 1000)
+      mongoose.connect(mongoUri, mongoOpts, function (err) {
+        if (err) {
+          console.log(new Date().toISOString(), 'Connection to mongodb failed');
+          process.exit(1);
+        } else {
+          console.log(new Date().toISOString(), 'Connection to mongodb established');
+        }
+      })
+    }, 10 * 1000)
   } else {
-    console.log('Connection to mongodb established')
-  }
-});
+    console.log(new Date().toISOString(), 'Connection to mongodb established');
+  }  
+}).catch(() => {});
 
 // create new express application
 var app = express();
@@ -46,8 +52,6 @@ app.use(session({
   saveUninitialized: false
 }));
 
-//store: new redisStore({ host: 'localhost', port: 6379, client: client,ttl :  260}),
-
 // initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
@@ -57,23 +61,23 @@ app.get('/health', function(req, res) {
     res.send('Healthy\n');
 });
 
+// setup api endpoints
 app.use('/api', routes);
 
+// start serving requests
 var server = app.listen(3000, function () {
-  console.log('server listening on %d', server.address().port)
+  console.log(new Date().toISOString(), 'Server listening on port ', server.address().port)
 })
 
 // catch signals and handle shutdown gracefully
 process.on('SIGINT', function () {
-  console.info('Got SIGINT. Graceful shutdown ', new Date().toISOString());
+  console.info(new Date().toISOString(), 'Got SIGINT. Graceful shutdown');
   shutdown();
 })
-
 process.on('SIGTERM', function () {
-  console.info('Got SIGTERM. Graceful shutdown ', new Date().toISOString());
+  console.info(new Date().toISOString(), 'Got SIGTERM. Graceful shutdown');
   shutdown();
 })
-
 function shutdown() {
   server.close(function (err) {
     if (err) {
