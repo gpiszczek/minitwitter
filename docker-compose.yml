@@ -29,6 +29,8 @@ services:
     image: redis:4.0
     networks:
       - backend
+    volumes:
+      - redis-db:/data
   mongo:
     image: mongo:3.6
     command: ["mongod", "--smallfiles"]
@@ -45,3 +47,4 @@ networks:
 volumes:
   mongo-configdb:
   mongo-db:
+  redis-db:
