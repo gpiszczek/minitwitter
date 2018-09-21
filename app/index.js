@@ -9,6 +9,23 @@ var Strategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
 var routes = require('./routes/index');
 
+// external services configuration
+// mongodb
+const mongoHost = process.env.MINITWITTER_MONGO_HOST || 'mongo';
+const mongoPort = process.env.MINITWITTER_MONGO_PORT || 27017;
+const mongoDb = process.env.MINITWITTER_MONGO_DB || 'minitwitter';
+const mongoUser = process.env.MINITWITTER_MONGO_USER;
+const mongoPass = process.env.MINITWITTER_MONGO_PASS;
+// redis
+const redisHost = process.env.MINITWITTER_REDIS_HOST || 'redis';
+const redisPort = process.env.MINITWITTER_REDIS_PORT || 6379;
+const redisPass = process.env.MINITWITTER_REDIS_PASS;
+
+// session secret
+const sessSecret = process.env.MINITWITTER_SESSION_SECRET;
+
+console.log(new Date().toISOString(), 'MiniTwitter v0.003');
+
 // configure passport
 var User = require('./models/user');
 passport.use(new Strategy(User.authenticate()));
@@ -16,9 +33,14 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 // connect to mongodb
-var mongoUri = 'mongodb://mongo/minitwitter';
+var mongoUri = 'mongodb://' + mongoHost + ':' + mongoPort + '/' + mongoDb;
 var mongoOpts = { useMongoClient: true };
+if (mongoPass) {
+    mongoOpts.user = mongoUser;
+    mongoOpts.pass = mongoPass;
+}
 mongoose.Promise = global.Promise;
+console.log(new Date().toISOString(), 'Connecting to mongodb at', mongoUri);
 mongoose.connect(mongoUri, mongoOpts, function (err) {
   if (err) {
     console.log(new Date().toISOString(), 'Connection to mongodb failed, retrying...');
@@ -45,9 +67,16 @@ app.use(logger('combined'));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+var redisUri = 'redis://' + redisHost + ':' + redisPort + '/' + 0;
+var redisOpts = { host: redisHost, port: redisPort, logErrors: true };
+if (redisPass) {
+    redisOpts.pass = redisPass;
+}
+console.log(new Date().toISOString(), 'Connecting to redis at', redisUri);
+redisStore = new RedisStore(redisOpts);
 app.use(session({
-  store: new RedisStore({ host: 'redis', port: 6379 }),
-  secret: '9eL;{22FK>NQnd',
+  store: redisStore,
+  secret: sessSecret,
   resave: false,
   saveUninitialized: false
 }));
@@ -66,7 +95,7 @@ app.use('/api', routes);
 
 // start serving requests
 var server = app.listen(3000, function () {
-  console.log(new Date().toISOString(), 'Server listening on port ', server.address().port)
+  console.log(new Date().toISOString(), 'Server listening on port', server.address().port)
 })
 
 // catch signals and handle shutdown gracefully
