@@ -5,8 +5,6 @@ services:
     image: gpiszczek/minitwitter_web
     build:
       context: web
-    deploy:
-      replicas: 2
     networks:
       - frontend
     ports:
@@ -17,8 +15,6 @@ services:
     image: gpiszczek/minitwitter_app
     build:
       context: app
-    deploy:
-      replicas: 3
     networks:
       - frontend
       - backend
@@ -33,7 +29,7 @@ services:
       - redis-db:/data
   mongo:
     image: mongo:3.6
-    command: ["mongod", "--smallfiles"]
+    command: --smallfiles
     networks:
       - backend
     volumes:
